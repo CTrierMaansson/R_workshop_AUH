@@ -1,6 +1,6 @@
 #### Setting up environment - Task 1 ####
 
-set_up_environment()
+#set_up_environment()
 
 th <- load_packages()
 
@@ -60,3 +60,17 @@ rownames(mtcars_mod) <- NULL
 
 
 mtcars_mod_sele <- tidy_func_4()
+
+
+#### Saving files - Task 5 ####
+
+write.table(mtcars_mod_sele,
+            "C:/Users/chris/OneDrive/1PhD/R_workshop_AUH/R_workshop/data_files/mtcars_mod_sele.txt",
+            sep = "\t")
+
+mtcars_mod_sele <- read.table("C:/Users/chris/OneDrive/1PhD/R_workshop_AUH/R_workshop/data_files/mtcars_mod_sele.txt",
+                              header = TRUE,
+                              sep = "\t")
+
+
+

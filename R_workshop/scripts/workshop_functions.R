@@ -1,6 +1,6 @@
 set_up_environment <- function(){
     wd <- getwd()
-    dir.create("R_workshop")
+    dir.create("R_workshop",)
     #2
     wd <- paste0(wd,"/R_workshop/")
     setwd(wd)
@@ -127,3 +127,114 @@ tidy_func_3 <- function(data = iris_groups){
     return(df)
 }
 
+tidy_func_4 <- function(data = mtcars_mod){
+    df <- data %>% 
+        select(-c(vs,am,disp,drat,wt)) %>% 
+        filter(car %in% mtcars_types$car) %>% 
+        left_join(mtcars_types, by = "car") %>% 
+        arrange(desc(mpg))
+    return(df)
+}
+
+gg_func_1 <- function(data = mtcars_mod_sele){
+    gg <- ggplot(data,aes(x = manufacturer,y = mpg))+
+        geom_boxplot()+
+        theme_classic()+
+        th
+    return(gg)
+}
+
+gg_func_2 <- function(data = mtcars_mod_sele){
+    gg <- ggplot(data,aes(x = manufacturer,y = mpg))+
+        geom_boxplot(aes(fill = manufacturer),
+                     outlier.alpha = 0)+
+        geom_jitter(width = 0.3)+
+        scale_fill_viridis_d(begin = 0.2, end = 0.9)+
+        theme_classic()+
+        th
+    return(gg)
+}
+
+gg_func_3 <- function(data = iris){
+    gg <- ggplot(data = data, 
+                 aes(x = Petal.Width,
+                     y = Petal.Length))+
+        geom_point()+
+        theme_classic()+
+        th
+    return(gg)
+}
+
+gg_func_4 <- function(data = iris, species = NULL){
+    if(!is.null(species)){
+        data <- data %>% 
+            filter(Species == species)
+    }
+    gg <- ggplot(data = data, 
+                 aes(x = Petal.Width,
+                     y = Petal.Length))+
+        geom_point()+
+        theme_classic()+
+        th
+    return(gg)
+}
+
+gg_func_5 <- function(data = iris, species = NULL){
+    if(!is.null(species)){
+        data <- data %>% 
+            filter(Species == species)
+        lab = species
+    } else{
+        lab = "All species"
+    }
+    gg <- ggplot(data = data, 
+                 aes(x = Petal.Width,
+                     y = Petal.Length))+
+        geom_point()+
+        theme_classic()+
+        labs(title = lab)+
+        stat_cor()+
+        th
+    return(gg)
+}
+
+gg_func_6_a <- function(data = iris){
+    comparisons <- combn(as.character(unique(iris$Species)), 2, simplify = FALSE)
+    gg <- ggplot(data,aes(x = Species,y = Petal.Length))+
+        geom_boxplot(aes(fill = Species),
+                     outlier.alpha = 0)+
+        geom_jitter(width = 0.3)+
+        theme_classic()+
+        scale_fill_viridis_d(begin = 0.2,end = 0.9)+
+        stat_compare_means(method = "t.test",
+                           comparisons = comparisons)+
+        th
+    return(gg)
+}
+
+gg_func_6_b <- function(data = iris){
+    comparisons <- combn(as.character(unique(iris$Species)), 2, simplify = FALSE)
+    gg <- ggplot(data,aes(x = Species,y = Petal.Length))+
+        geom_violin(aes(fill = Species))+
+        theme_classic()+
+        scale_fill_viridis_d(begin = 0.2,end = 0.9)+
+        stat_compare_means(method = "t.test",
+                           comparisons = comparisons)+
+        th
+    return(gg)
+}
+
+gg_func_6_c <- function(data = iris){
+    comparisons <- combn(as.character(unique(iris$Species)), 2, simplify = FALSE)
+    gg <- ggplot(data,aes(x = Species,y = Petal.Length))+
+        geom_bar(aes(fill = Species),
+                 stat = "summary")+
+        geom_point()+
+        coord_flip()+
+        theme_classic()+
+        scale_fill_viridis_d(begin = 0.2,end = 0.9)+
+        stat_compare_means(method = "t.test",
+                           comparisons = comparisons)+
+        th
+    return(gg)
+}
