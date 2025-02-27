@@ -134,11 +134,14 @@ df %>%
 
 ### Tasks for environment
 
+Use the commands above or go to File -> New file etc. 
+You can go to the Pathfinder(MS)/Finder(IOS) to create the directories
+
 1. Create a folder called R_workshop
 2. Create R_workshop/scripts/
-    3. Within R_workshop/scripts/ create three .R files: *workshop_functions.R, workshop_data.R, workshop_plots.R*
-    4. Create R_workshop/plots
-5. Create R_workshop/data_files
+3. Within R_workshop/scripts/ create three .R files: *workshop_functions.R, workshop_data.R, workshop_plots.R*
+4. Create R_workshop/plots/
+5. Create R_workshop/data_files/
 6. Check that the correct files and folders have been created
 7. Setup your R studio as shown in **Fig. 2**
     
@@ -268,13 +271,17 @@ my_function()
 ```
 ## Task for functions
 
-We now try creating some functions using the built-in data set `iris`. 
+We now try to create some functions using the built-in data set `iris`. 
 **Try to use the R-studio formatting we created above.** 
     
 Relevant functions for these task:
     
 ```{r,echo=F,highlight=T,messages = F}
 library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(ggpubr)
+library(viridis)
 df <- data.frame(functions = c("class(<object>)",
                                "str(<object>)",
                                "list('<Entry_1>' = result)",
@@ -329,6 +336,8 @@ class(iris[["Sepal.Length"]])
 This function must be able to calculate the average values of 
 `Sepal.Length` & `Sepal.Width` and return the values in a named `list`
 
+*Hint: use len <- mean(data$Sepal.Length) and list('Sepal.Length_mean' = len)*
+
 **Solution:**
     
 ```{r, highlight=T,message=F,eval=TRUE,echo = T}
@@ -345,9 +354,12 @@ my_func_1()
 
 3. Recreate `my_func_1()` as `my_func_2()`, now with two arguments (`data` & `variable`)
 
-`variable` is a column name existing in `iris` and extract the average values 
-for `variable`. 
+`variable` is a column name existing in `iris`. Use `variable` to extract values
+from `iris` and calculate the average. 
 The function should still return a named list with the average value
+
+*Hint: use values <- data[[variable]], label <- paste0(variable,"_mean")*,
+*and names(list()) <- label*
 
 **Solution:**
     
@@ -369,6 +381,8 @@ an average (meaning `variable` contains `numeric` values)
 
 If these requirements are not met the function should give an error (`stop()`)
 The function should still return a named list with the average value
+
+*Hint: use *`if(!is.numeric()){stop()}` and `if(!is.character()){stop()}`
 
 **Solution:**
     
@@ -398,6 +412,8 @@ my_func_3(variable = "Sepal.Width")
 and make sure `variable` only can contain variable names present in the data set used as `data`
 
 The function should still return a named list with the average value
+
+*Hint: use vars <- colnames(data) and if(!(variable %in% vars)){stop()}*
 
 **Solution:**
     
@@ -436,7 +452,7 @@ my_func_4(data = Puromycin, variable = "rate")
 
 # `tidy`
 
-`tidy` is a "language" within R which is outside of `base` R. It much more powerful
+`tidy` is a "language" within R which is outside of `base` R. It much more powerful,
 fast, and intuitive than `base` R. I recommend ALWAYS using `tidy` to perform basic
 table manipulation, plotting etc. Most `tidy` packages can be loaded with
 `library(tidyverse)`, however I recommend loading individual `tidy` packages. 
@@ -449,7 +465,14 @@ The most frequently used include:
 
 So now run:
     
-```{r, highlight=T,message=F,eval=TRUE,echo = T,class.source="fold-show"}
+```{r, highlight=T,message=F,eval=FALSE,echo = T,class.source="fold-show"}
+# If you DONT have the packages installed run:
+install.packages("dplyr")
+install.packages("ggplot2")
+install.packages("ggpubr")
+install.packages("tidyr")
+
+#Then the packages can be loaded
 library(dplyr)
 library(ggplot2)
 library(ggpubr)
@@ -528,7 +551,7 @@ iris %>%
 
 ```
 
-build in functions e.g. `last_col()` `starts_with()`, `contains()` 
+Build in functions e.g. `last_col()` `starts_with()`, `contains()` 
 can be used to select specific columns. 
 You can select all columns except one (or several) columns with `-`
 
@@ -605,7 +628,7 @@ entries then use `reframe()`.
 ### `join()` 
 
 Several join functions exist. They are used to combine `data.frames` based on 
-common entries, where column name typically is identical.
+common entries, where the column name typically is identical.
 I think the following picture very intuitively illustrates the differences
 between each type of `join` function. 
 
@@ -666,9 +689,11 @@ df %>%
 
 ```
 
-1. Create a function `tidy_func_1()` which takes the iris data set as default the `data` argument 
+1. Create a function `tidy_func_1()` which takes the iris data set as default `data` argument 
 and classifies observations as "long" (Petal.Length >=5) or "short" (Petal.Length < 5).
 The resulting `data.frame` must be exported and saved as `iris_mod`
+
+*Hint: use mutate()*
 
 **Solution:**
     
@@ -688,6 +713,7 @@ iris_mod <- tidy_func_1()
 as a default argument and count the number of "long" and "short" 
 entries for each `Species` *HINT: use two variable names in group_by()*.
 The resulting ungrouped `data.frame` must be exported and saved as `iris_groups`
+
 
 **Solution:**
     
@@ -760,8 +786,7 @@ mtcars_types <- data.frame(car = c("Mazda RX4",
 
 ```
 
-and rename `mtcars` to `mtcars_mod` then add the rownames of `mtcars` as a variable 
-and remove the rownames:
+And run the following commands to create `mtcars_mod` from the built-in `mtcars`:
     
 ```{r, highlight=T,message=F,eval=TRUE,echo = TRUE,class.source="fold-show"}
 mtcars_mod <- mtcars
@@ -771,7 +796,8 @@ rownames(mtcars_mod) <- NULL
 ```
 
 4. Create a function `tidy_func_4()` which takes `mtcars_mod` as a default 
-argument. Remove the variables `vs`,`disp`,`drat`,`wt` and `am`. Then select cars also present in
+argument. Remove the variables `vs`,`disp`,`drat`,`wt` and `am`. 
+Then filter cars also present in
 `mtcars_types` and add the column with the corresponding manufacturer. 
 *HINT: use one of the `join` functions to combine the data.frames*. Then sort
 the data set according to `mpg` with the highest value as the first row.
@@ -796,7 +822,8 @@ mtcars_mod_sele <- tidy_func_4()
 
 It can often be relevant to save your `data.frames` to save time.
 Sometimes you perform extensive analyses, where the output can be relatively 
-simple. To save time, save the output and then reload the next time you open R
+simple. By saving the data you do not have to re-analyze the data and you can 
+move quickly to stats, plots, etc. 
 
 ## Saving as `.txt`
 
@@ -820,11 +847,11 @@ Helpful functions for saving:
 library(dplyr)
 df <- data.frame(functions = c("saveRDS(<object>, <path>)",
                                "readRDS(<path>)",
-                               "write.table(<object>, <path>, sep = '\t')",
-                               "read.table(<path>, header = TRUE, sep = '\t')"),
+                               "write.table(<object>, <path>)",
+                               "read.table(<path>, header = TRUE)"),
                  description = c("Save an object in the designated path, finish the path with <file_name>.rds",
                                  "Import a .rds object back into R from the path",
-                                 "Save a table in the designated path, finish the path with <file_name>.txs",
+                                 "Save a table in the designated path, finish the path with <file_name>.txt",
                                  "Import a table back into R from the path as a data.frame"))
 df %>% 
     knitr::kable() %>% 
@@ -835,8 +862,8 @@ df %>%
 
 1. in `workshop_data.R` save `mtcars_mod_sele` as `mtcars_mod_sele.txt` in the 
 `R_workshop/data_files/` directory and write code to reload the data set.
-*HINT: I always suggest to write the FULL PATH as <path>. Use `getwd()` to get*
-*the full path to your current directory*
+*HINT: I always suggest to write the FULL PATH when saving and reloading.*
+*Use `getwd()` to get the full path to your current directory*
 
 **Solution**
 
@@ -904,8 +931,8 @@ ggplot(data = df, aes(x = var1, y = var2))+ #Define what from the data is used
 
 It is important to understand what goes inside `aes()`:
     
-`aes` stands for aesthetics which encompass what variables from the dataset can 
-affect how the plot looks in the end. 
+`aes` stands for aesthetics which encompass what variables from the data set can 
+affect how the plot looks like in the end. 
 
 `aes` parameters include (but are not limited to):
     
@@ -934,7 +961,7 @@ ggplot(data = df, aes(x = var1, y = var2,# data from var1 and var2 is plotted
 
 But `aes` can also be included in the different `geom()` functions. 
 This is smart because then two separate variables can determine the color of
-e.g. lines. Like this:
+e.g. lines and points. Like this:
     
 ```{r, eval = F,highlight=T,message=F,error=TRUE,echo = T,class.source="fold-show"}
 
@@ -964,11 +991,44 @@ ggplot(data = df, aes(x = var1, y = var2))+ # data from var1 and var2 is plotted
 10. geom_violin - basic violin plots
 11. geom_tile - Sqaures used for heatmaps
 
+Here a few examples of how `geoms` can be used:
+
+```{r, eval = T,highlight=T,message=F,error=TRUE,echo = T,class.source="fold-show"}
+
+ggplot(iris,aes(x = Petal.Width,y = Petal.Length))+
+    geom_point()
+
+ggplot(iris,aes(x = Species,y=Petal.Length))+
+    geom_bar(stat = "summary")
+
+ggplot(iris,aes(x = Species,y=Petal.Length))+
+    geom_boxplot()
+
+ggplot(iris,aes(x = Petal.Width,y = Petal.Length))+
+    geom_point()+
+    geom_smooth(method = "lm")
+
+ggplot(mtcars_mod_sele, aes(x=mpg,y=hp))+
+    geom_point(aes(color = manufacturer),
+               size = 4)+
+    geom_text(aes(label = car),size = 3)
+```
+
 ### `viridis`, `theme()` and general layout
 
 **I think the default colors in R ugly.** I therefore almost always use the color
 pallets in the `viridis` package. They similar to default R colors, but just 
 nicer. 
+
+Therefore run:
+    
+```{r, highlight=T,message=F,eval=F,echo = T,class.source="fold-show"}
+# If you DONT have the package installed run:
+install.packages("viridis")
+
+#Then the packages can be loaded
+library(viridis)
+```
 
 `theme()` is a function to customize the layout of your plot such as font sizes,
 angles, font types etc. To generalize things for a project I add the same theme
@@ -1379,6 +1439,13 @@ ggsave(filename = "gg_6_c.pdf",
        units = "px",
        device = "pdf")
 ```
+
+# Happy coding :D
+
+```{r, echo=FALSE, fig.cap="Fig 7", out.width='30%'}
+knitr::include_graphics("sparrow.jpg")
+```
+
 
 \newpage
 # Session info
